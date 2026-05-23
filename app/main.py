@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine, Base
 from app.routers import users, listings, orders
 import logging
+from app.models import *
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -16,6 +18,8 @@ app = FastAPI(
     description="Student Marketplace Backend API for buying and selling used books and academic hardware",
     version="1.0.0"
 )
+Base.metadata.create_all(bind=engine)
+
 
 # CORS configuration
 app.add_middleware(
