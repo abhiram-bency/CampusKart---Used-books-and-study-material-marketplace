@@ -20,13 +20,31 @@ def create_listing(
     db.refresh(new_listing)
     return new_listing
 
+@router.get("/me", response_model=List[ListingResponse])
+def get_my_listings(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    listings = db.query(Listing).filter(Listing.owner_id == current_user.id).all()
+    return listings
+
 @router.get("", response_model=List[ListingResponse])
 def get_listings(
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
+    category: str = None,
+    search: str = None,
     db: Session = Depends(get_db)
 ):
-    listings = db.query(Listing).offset(skip).limit(limit).all()
+    query = db.query(Listing)
+
+    if category:
+        query = query.filter(Listing.category == category)
+
+    if search:
+        query = query.filter(Listing.title.ilike(f"%{search}%"))
+
+    listings = query.offset(skip).limit(limit).all()
     return listings
 
 @router.get("/{listing_id}", response_model=ListingResponse)

@@ -45,6 +45,21 @@ services:
       - .:/app
     restart: unless-stopped
 
+  frontend:
+    build:
+      context: ./frontend
+    container_name: campuskart_frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
+
   celery_worker:
     build: .
     container_name: campuskart_celery

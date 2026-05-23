@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: #0a0f1a;
+    color: #f1f5f9;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #0f172a; }
+  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #475569; }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-brand-500 hover:bg-brand-400 text-white font-medium px-5 py-2.5 rounded-xl transition-all duration-200 
+           shadow-glow hover:shadow-glow-lg hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 
+           disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none;
+  }
+  .btn-secondary {
+    @apply bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium px-5 py-2.5 rounded-xl transition-all 
+           duration-200 border border-slate-700 hover:border-slate-600 hover:-translate-y-0.5 active:translate-y-0;
+  }
+  .btn-danger {
+    @apply bg-red-500/10 hover:bg-red-500/20 text-red-400 font-medium px-5 py-2.5 rounded-xl transition-all 
+           duration-200 border border-red-500/20 hover:border-red-500/40;
+  }
+  .card {
+    @apply bg-slate-900 border border-slate-800 rounded-2xl shadow-card hover:shadow-card-hover 
+           transition-all duration-300 hover:-translate-y-1;
+  }
+  .input-field {
+    @apply w-full bg-slate-800/60 border border-slate-700 text-slate-100 placeholder-slate-500 
+           rounded-xl px-4 py-3 text-sm transition-all duration-200 outline-none
+           focus:border-brand-500 focus:bg-slate-800 focus:ring-2 focus:ring-brand-500/20;
+  }
+  .label {
+    @apply block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide;
+  }
+  .page-title {
+    @apply font-display text-3xl md:text-4xl font-bold text-white;
+  }
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  .shimmer {
+    background: linear-gradient(90deg, #1e293b 25%, #2d3f55 50%, #1e293b 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  .glass {
+    @apply bg-slate-900/80 backdrop-blur-md border border-slate-800/60;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, #e8a03a, #e08518);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .bg-mesh {
+    background-image: 
+      radial-gradient(at 40% 20%, rgba(224,133,24,0.08) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, rgba(232,160,58,0.05) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, rgba(197,105,15,0.05) 0px, transparent 50%);
+  }
+}
