@@ -6,7 +6,7 @@ import OrderStatusBadge from '../components/OrderStatusBadge'
 import { BookOpen, Cpu, Tag, User, ArrowLeft, ShoppingCart, Share2, CheckCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-const CATEGORY_ICONS = { books: BookOpen, hardware: Cpu }
+const CATEGORY_ICONS = { book: BookOpen, hardware: Cpu }
 
 const ListingDetailPage = () => {
   const { id } = useParams()
@@ -18,7 +18,7 @@ const ListingDetailPage = () => {
   const [ordered, setOrdered] = useState(false)
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchListing = async () => {
       setLoading(true)
       try {
         const { data } = await listingsService.getById(id)
@@ -30,7 +30,7 @@ const ListingDetailPage = () => {
         setLoading(false)
       }
     }
-    fetch()
+    fetchListing()
   }, [id])
 
   const handleOrder = async () => {
@@ -41,7 +41,11 @@ const ListingDetailPage = () => {
       toast.success('Order placed successfully!')
       setOrdered(true)
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Could not place order')
+      const detail = err.response?.data?.detail
+      const msg = Array.isArray(detail)
+        ? detail.map(d => d.msg).join(', ')
+        : detail || 'Could not place order'
+      toast.error(msg)
     } finally {
       setOrdering(false)
     }
@@ -65,7 +69,14 @@ const ListingDetailPage = () => {
 
   const cat = listing.category?.toLowerCase()
   const Icon = CATEGORY_ICONS[cat] || Tag
-  const isMine = user?.id === listing.seller?.id
+
+  // Use owner_id from API response to check if this listing belongs to current user
+  const isMine = user && listing.owner_id && (
+    // Try matching by id if available in user object
+    (user.id && user.id === listing.owner_id) ||
+    // Fallback: decode from token via AuthContext if user.id not present
+    false
+  )
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 animate-slide-up">
@@ -104,7 +115,7 @@ const ListingDetailPage = () => {
             <div>
               <p className="text-xs text-slate-500">Seller</p>
               <p className="text-white font-medium text-sm">
-                {listing.seller?.name || listing.seller?.email || 'Unknown'}
+                {listing.seller?.name || listing.seller?.email || `Seller #${listing.owner_id}`}
               </p>
             </div>
           </div>
@@ -116,28 +127,25 @@ const ListingDetailPage = () => {
                 ₹{(listing.price || 0).toLocaleString('en-IN')}
               </p>
             </div>
-            {!isMine && (
-              ordered ? (
-                <div className="flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium text-sm">
-                  <CheckCircle size={16} /> Ordered!
-                </div>
-              ) : (
-                <button
-                  onClick={handleOrder}
-                  disabled={ordering}
-                  className="btn-primary flex items-center gap-2 px-6 py-3"
-                >
-                  {ordering
-                    ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                    : <><ShoppingCart size={16} /> Buy Now</>
-                  }
-                </button>
-              )
-            )}
-            {isMine && (
+            {isMine ? (
               <Link to="/my-listings" className="btn-secondary text-sm">
                 Manage Listing
               </Link>
+            ) : ordered ? (
+              <div className="flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium text-sm">
+                <CheckCircle size={16} /> Ordered!
+              </div>
+            ) : (
+              <button
+                onClick={handleOrder}
+                disabled={ordering || !isAuthenticated}
+                className="btn-primary flex items-center gap-2 px-6 py-3"
+              >
+                {ordering
+                  ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  : <><ShoppingCart size={16} /> Buy Now</>
+                }
+              </button>
             )}
           </div>
         </div>

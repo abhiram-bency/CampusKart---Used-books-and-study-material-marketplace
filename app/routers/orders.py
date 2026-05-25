@@ -27,9 +27,12 @@ def create_order(
     db.commit()
     db.refresh(new_order)
     
-    # Trigger background task
-    send_order_notification.delay(new_order.id)
-    
+    # Trigger background task — don't fail the order if Celery/Redis is unavailable
+    try:
+        send_order_notification.delay(new_order.id)
+    except Exception:
+        pass
+
     return new_order
 
 @router.get("/me", response_model=List[OrderDetailResponse])
